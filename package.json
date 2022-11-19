@@ -1,0 +1,32 @@
+{
+  "name": "file-scaffolder",
+  "version": "1.0.0",
+  "description": "A tool to quickly generate files and folder structures for your project",
+  "main": "./src/modules.js",
+  "dependencies": {
+    "@supercharge/filesystem": "^2.3.0",
+    "js-beautify": "^1.14.3",
+    "yargs": "13.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "file-scaffolder" : "./src/index.js"
+  },
+  "author": {
+    "name": "Maleesha Gimshan",
+    "url": "https://github.com/maleeshagimshan98"
+  },
+  "keywords": [
+    "vue",
+    "react",
+    "koa",
+    "sails",
+    "file-scaffold",
+    "folder",
+    "scaffold"
+  ],
+  "license": "MIT"
+}

@@ -1,0 +1,43 @@
+[
+  {
+    "app": [{ "preLoader.vue": "" }, { "sidebar.vue": "" }]
+  },
+  {
+    "components": [
+      {
+        "comp1.vue": "test_component1"
+      },
+      {
+        "comp2.vue": "test_component2"
+      },
+      {
+        "comp3.vue": "test_component3"
+      },
+      {
+        "component_subfolder": [
+          {
+            "name": "child_folder_file_1.vue",
+            "contentProvider": "subfoldertestcontent1"
+          },
+          {
+            "name": "child_folder_file_2.vue",
+            "contentProvider": {
+              "names": "subfoldertestcontent2"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "pages": [
+      { "home.vue": "" },
+      { "about_us.vue": "" },
+      { "projects.vue": "" },
+      { "orders.vue": "" }
+    ]
+  },
+  {
+    "state": [{ "user.js": "" }, { "products.js": "" }, { "orders.js": "" }]
+  }
+]
