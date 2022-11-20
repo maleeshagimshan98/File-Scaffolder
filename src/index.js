@@ -20,7 +20,32 @@ const options = yargs.usage('Usage: -path <path>').option("p", {
         describe: "target folder path - the folder path where generated files created",
         demandOption: true
     })
+.option(
+    "c",
+    {
+        alias: "content",
+        describe: "path/to/content_proviers - direct to an index,js file exporting an object of ContentProvider classes",
+        demandOption: false
+    })
 .argv
+
+/**
+ * import and initialize content provider classes
+ * 
+ * @returns object | void
+ */
+function initContentProviders ()
+{
+    if (options.content) {
+        let contentProviderClasses = require(`../${options.content}`)
+        let contentProviders = {}
+
+        for (let cls in contentProviderClasses) {
+            contentProviders[cls] = new contentProviderClasses[cls]()
+        }
+        return contentProviders
+    }
+}
 
 /**
  * handle the scaffolding of the project
@@ -28,13 +53,14 @@ const options = yargs.usage('Usage: -path <path>').option("p", {
  * @return {void}
  */
 async function scaffold() {
-    try {
+    let start = Date.now() //... get timestamp
+    try {        
         if (!options.path) {
             throw new Error('Please enter the path/to/configuration')
-        }
+        }        
 
         let config = JSON.parse(await fs.readFile(options.path))
-        let scaffolder = new Scaffolder()
+        let scaffolder = new Scaffolder(initContentProviders())
         scaffolder.init(config,options.target)
 
         /**
@@ -61,6 +87,10 @@ async function scaffold() {
         fs.emptyDir(options.target)        
     }
 
+    let end = Date.now()
+    
+    console.log(`\n ==== Done! ==== \n`)
+    console.log(`Operation completed in ${(end-start)} miliseconds `)
 }
 
 scaffold()

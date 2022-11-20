@@ -33,6 +33,7 @@ class Scaffolder {
    * parse file data
    *
    * @param {Object} data
+   * @param {String} path
    * @returns {File}
    * @throws Error
    */
@@ -44,15 +45,14 @@ class Scaffolder {
     if (Object.keys(data).length == 1) {
       for (let prop in data) {
         //... type 1        
-        return new File(prop, `${path}`, data[prop]) //... check
+        return new File(prop, `${path}`, new ContentProvider(data[prop]))
       }
     }    
     
     if (!data.hasOwnProperty("name") || !data.hasOwnProperty("contentProvider")) {
       //... invalid file configuration
-      throw new Error (`Invalid configuration data at ${path}`)
+      throw new Error (`Invalid configuration data at ${path}. \n following properties must exist - name, contentProvider`)
     }
-
     if (!this._contentProviders || Object.keys(this._contentProviders).length == 0) {
       throw new Error(`ContentProvider classes are not defined in Scaffolder.js `)
     }
@@ -61,25 +61,15 @@ class Scaffolder {
     if (typeof data.contentProvider == "string") {
 
       if (!this._isContentProviderDefined(data.contentProvider)) {
-        throw new Error(`ContentProvider "${data.contentProvider}" at '${path}' is not defined`)
+        throw new Error(`ContentProvider "${data.contentProvider}" is not defined at '${path}/${data.name}' `)
       }
 
-      return new File(data.name,`${path}`,this._contentProviders[data.contentProvider].getContent())
+      let fileData = data.data && Object.keys(data.data).length > 0 ? data.data : null
+
+      return new File(data.name,`${path}`,this._contentProviders[data.contentProvider],fileData)
     }
-
-      //... type 3
-      if (typeof data.contentProvider === "object") {
-        if (!data.contentProvider.hasOwnProperty("name")) {
-          throw new Error(`contentProvider.name is not defined at following file ${path}/${data.name}`)
-        }
-
-        if (!this._isContentProviderDefined(data.contentProvider.name)) {
-          throw new Error(`ContentProvider "${data.contentProvider.name}" is not defined at ${path}/${data.name}`)
-        }
-
-        return new File(data.name,`${path}`,this._contentProviders[data.contentProvider.name].getContent())
-      }
-    }
+      
+  }
 
   /**
    * parse folder config
@@ -126,7 +116,21 @@ class Scaffolder {
   }
 
   /**
-   * handle the scaffolding of the project
+   * add folder tree array to all content provider instances
+   * 
+   * @return void
+   */
+   _provideContext ()
+   {
+      if (this._contentProviders) {
+        for (let cp in this._contentProviders) {
+          this._contentProviders[cp].addContext(this._folderTree)
+        }
+      }
+   }
+
+  /**
+   * parse the configuration file and create the virtual folder tree
    *
    * @param {object} config
    * @return {void}
@@ -142,6 +146,7 @@ class Scaffolder {
         this._errors.push({ message: e.message })
       }
     })
+    this._provideContext()  //... passing the folder tree object to every content provider
   }
 
   /**
@@ -188,7 +193,7 @@ class Scaffolder {
    */
   _saveFolder(folder) {
     if (!folder.hasChildren()) {
-      fs.ensureDir() //... give directory path
+      fs.ensureDir(folder.getPath()) //... give directory path
     } else {
       folder.getChildren().forEach((child) => {
         if (child.getType() == "File") {
@@ -202,7 +207,7 @@ class Scaffolder {
   }
 
   /**
-   * Start parsing the configuration and creating the folder structure
+   * Start creating the folder structure
    * 
    * @return void
    */
@@ -210,7 +215,7 @@ class Scaffolder {
     if (this.hasErrors()) {
       throw new Error("FileScaffolder:ERROR - ") //... throw errors it tried to save files while having errors
     }
-    try {
+    try {      
       this._folderTree.forEach((node) => {
         switch (node.getType()) {
           case "File":

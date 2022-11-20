@@ -4,12 +4,21 @@
  
  class File {
  
-     constructor (name, path, content)
+   /**
+    * constructor 
+    * 
+    * @param {String} name 
+    * @param {String} path 
+    * @param {ContentProvider} contentProvider 
+    */
+     constructor (name, path, contentProvider, data = null)
      {
          this.name = name
          this.path = path
          this.type = "File"
-         this._content = content
+         this._contentProvider = contentProvider
+         this._content = ``
+         this._data = data
      }
  
      /**
@@ -62,8 +71,7 @@
      setContent ( content)
      {
         this._content = content
-     }     
- 
+     } 
      
      /**
       * get the file's content
@@ -72,7 +80,33 @@
       */
      getContent ()
      {
-        return this._content
+         try {
+            this._content = this._contentProvider.getContent(this._data)
+            return this._content
+         }
+         catch (error) {
+            throw new Error(`\n An error occured while creating content for the file at ${this.path}/${this.name} \n \n ${error.message}`)
+         }
+     }
+
+     /**
+      * get the variable data parameters of file content
+      * 
+      * @returns {object| null}
+      */
+     getData()
+     {
+      return this._data
+     }
+
+     /**
+      * set variable data of the file content
+      * 
+      * @param {object} data 
+      */
+     setData(data)
+     {
+      this._data = data
      }
 
      /**

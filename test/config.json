@@ -1,4 +1,5 @@
 [
+  "test-folder",
   {
     "app": [{ "preLoader.vue": "" }, { "sidebar.vue": "" }]
   },
@@ -17,13 +18,14 @@
         "component_subfolder": [
           {
             "name": "child_folder_file_1.vue",
-            "contentProvider": "subfoldertestcontent1"
+            "contentProvider": "cp1"
           },
           {
             "name": "child_folder_file_2.vue",
-            "contentProvider": {
-              "names": "subfoldertestcontent2"
-            }
+            "contentProvider" : "cp2",
+            "data" : {
+              "data_1" : "this is a meta data"
+            }            
           }
         ]
       }
